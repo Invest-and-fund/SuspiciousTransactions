@@ -436,8 +436,52 @@ Module SuspiciousTransactions
 
             ExecuteIT = sHTML
 
+            MySQL = " Insert into REPORTRUN (REPORTNAME,SUCCESS,EMAILSENT,MSGDATA) VALUES (@P1,@P2,@P3,@P4)"
+
+            If FBSQLEnv = "FB" Then
+                Dim strConn As String
+                Dim MyConn As FirebirdSql.Data.FirebirdClient.FbConnection
+                Dim Cmd As New FirebirdSql.Data.FirebirdClient.FbCommand
+                strConn = System.Configuration.ConfigurationManager.ConnectionStrings("FBConnectionString").ConnectionString
+                MyConn = New FirebirdSql.Data.FirebirdClient.FbConnection(strConn)
+                MyConn.Open()
+                Cmd.Connection = MyConn
+                Cmd.CommandText = MySQL
+                Cmd.Parameters.Clear()
+                Cmd.Parameters.Add("p1", FirebirdSql.Data.FirebirdClient.FbDbType.Char).Value = "SUSPICIOUSTRANSACTIONS"
+                Cmd.Parameters.Add("p2", FirebirdSql.Data.FirebirdClient.FbDbType.Char).Value = 1
+                Cmd.Parameters.Add("p3", FirebirdSql.Data.FirebirdClient.FbDbType.Char).Value = 1
+                Cmd.Parameters.Add("p4", FirebirdSql.Data.FirebirdClient.FbDbType.Char).Value = ""
+                Cmd.ExecuteNonQuery()
+
+                MyConn.Close()
+                MyConn = Nothing
+            Else
+                Using con As New SqlConnection(System.Configuration.ConfigurationManager.ConnectionStrings("SQLConnectionString").ConnectionString)
+                    con.Open()
+
+                    Dim command As SqlCommand = con.CreateCommand()
+                    command.Connection = con
+
+                    Try
+                        command.CommandText = MySQL
+                        With command.Parameters
+                            .Add(New SqlParameter("@p1", "SUSPICIOUSTRANSACTIONS"))
+                            .Add(New SqlParameter("@p2", 1))
+                            .Add(New SqlParameter("@p3", 1))
+                            .Add(New SqlParameter("@p4", ""))
+
+                        End With
+                        command.ExecuteNonQuery()
+                    Catch ex As Exception
+
+                    End Try
+                End Using
+            End If
         Catch ex As Exception
             s = ex.Message
+            SendErrorMessage(ex)
+            ExecuteIT = 0
         End Try
     End Function
 
@@ -498,7 +542,50 @@ Module SuspiciousTransactions
             .Port = 587
         }
         smtp.Send(mm)
+        Dim MySQL As String
+        Dim FBSQLEnv As String = System.Configuration.ConfigurationManager.AppSettings("RunFBSQL")
+        MySQL = " Insert into REPORTRUN (REPORTNAME,SUCCESS,EMAILSENT,MSGDATA) VALUES (@P1,@P2,@P3,@P4)"
 
+        If FBSQLEnv = "FB" Then
+            Dim strConn As String
+            Dim MyConn As FirebirdSql.Data.FirebirdClient.FbConnection
+            Dim Cmd As New FirebirdSql.Data.FirebirdClient.FbCommand
+            strConn = System.Configuration.ConfigurationManager.ConnectionStrings("FBConnectionString").ConnectionString
+            MyConn = New FirebirdSql.Data.FirebirdClient.FbConnection(strConn)
+            MyConn.Open()
+            Cmd.Connection = MyConn
+            Cmd.CommandText = MySQL
+            Cmd.Parameters.Clear()
+            Cmd.Parameters.Add("p1", FirebirdSql.Data.FirebirdClient.FbDbType.Char).Value = "SUSPICIOUSTRANSACTIONS"
+            Cmd.Parameters.Add("p2", FirebirdSql.Data.FirebirdClient.FbDbType.Char).Value = 0
+            Cmd.Parameters.Add("p3", FirebirdSql.Data.FirebirdClient.FbDbType.Char).Value = 0
+            Cmd.Parameters.Add("p4", FirebirdSql.Data.FirebirdClient.FbDbType.Char).Value = ThisException.Message
+            Cmd.ExecuteNonQuery()
+
+            MyConn.Close()
+            MyConn = Nothing
+        Else
+            Using con As New SqlConnection(System.Configuration.ConfigurationManager.ConnectionStrings("SQLConnectionString").ConnectionString)
+                con.Open()
+
+                Dim command As SqlCommand = con.CreateCommand()
+                command.Connection = con
+
+                Try
+                    command.CommandText = MySQL
+                    With command.Parameters
+                        .Add(New SqlParameter("@p1", "SUSPICIOUSTRANSACTIONS"))
+                        .Add(New SqlParameter("@p2", 0))
+                        .Add(New SqlParameter("@p3", 0))
+                        .Add(New SqlParameter("@p4", ThisException.Message))
+
+                    End With
+                    command.ExecuteNonQuery()
+                Catch ex As Exception
+
+                End Try
+            End Using
+        End If
     End Sub
 
     Public Function ItemFormat(ByVal Title As String, ByVal Message As String) As String
