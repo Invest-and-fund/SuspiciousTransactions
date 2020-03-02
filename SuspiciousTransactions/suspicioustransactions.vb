@@ -213,7 +213,7 @@ Module SuspiciousTransactions
                 and u.USERID not in (10,20,30)
                 and ft.TRANSTYPE in (1100)
                 and not exists(select * from FIN_TRANS ft1
-                where ft1.DATECREATED  between ft.DATECREATED and ft.DATECREATED + 10
+                where ft1.DATECREATED  between ft.DATECREATED - 10 and ft.DATECREATED + 10
                 and ft.ACCOUNTID = ft1.ACCOUNTID
                 and ft1.TRANSTYPE in (1200,1401))"
 
@@ -226,7 +226,7 @@ Module SuspiciousTransactions
                 and u.USERID not in (10,20,30)
                 and ft.TRANSTYPE in (1100)
                 and not exists(select * from FIN_TRANS ft1
-                where ft1.DATECREATED  between ft.DATECREATED and dateadd(d, @p2,ft.DATECREATED)
+                where ft1.DATECREATED  between dateadd(d, -@p2,ft.DATECREATED) and dateadd(d, @p2,ft.DATECREATED)
                 and ft.ACCOUNTID = ft1.ACCOUNTID
                 and ft1.TRANSTYPE in (1200,1401));"
 
