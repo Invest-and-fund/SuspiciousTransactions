@@ -449,8 +449,8 @@ Module SuspiciousTransactions
                 Cmd.CommandText = MySQL
                 Cmd.Parameters.Clear()
                 Cmd.Parameters.Add("p1", FirebirdSql.Data.FirebirdClient.FbDbType.Char).Value = "SUSPICIOUSTRANSACTIONS"
-                Cmd.Parameters.Add("p2", FirebirdSql.Data.FirebirdClient.FbDbType.Char).Value = 1
-                Cmd.Parameters.Add("p3", FirebirdSql.Data.FirebirdClient.FbDbType.Char).Value = 1
+                Cmd.Parameters.Add("p2", FirebirdSql.Data.FirebirdClient.FbDbType.Integer).Value = 1
+                Cmd.Parameters.Add("p3", FirebirdSql.Data.FirebirdClient.FbDbType.Integer).Value = 1
                 Cmd.Parameters.Add("p4", FirebirdSql.Data.FirebirdClient.FbDbType.Char).Value = ""
                 Cmd.ExecuteNonQuery()
 
@@ -557,8 +557,8 @@ Module SuspiciousTransactions
             Cmd.CommandText = MySQL
             Cmd.Parameters.Clear()
             Cmd.Parameters.Add("p1", FirebirdSql.Data.FirebirdClient.FbDbType.Char).Value = "SUSPICIOUSTRANSACTIONS"
-            Cmd.Parameters.Add("p2", FirebirdSql.Data.FirebirdClient.FbDbType.Char).Value = 0
-            Cmd.Parameters.Add("p3", FirebirdSql.Data.FirebirdClient.FbDbType.Char).Value = 0
+            Cmd.Parameters.Add("p2", FirebirdSql.Data.FirebirdClient.FbDbType.Integer).Value = 0
+            Cmd.Parameters.Add("p3", FirebirdSql.Data.FirebirdClient.FbDbType.Integer).Value = 0
             Cmd.Parameters.Add("p4", FirebirdSql.Data.FirebirdClient.FbDbType.Char).Value = ThisException.Message
             Cmd.ExecuteNonQuery()
 
