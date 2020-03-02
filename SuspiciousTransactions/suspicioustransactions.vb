@@ -52,6 +52,7 @@ Module SuspiciousTransactions
         Dim FBSQLEnv As String = System.Configuration.ConfigurationManager.AppSettings("RunFBSQL")
         sUsers = Configuration.ConfigurationManager.AppSettings("EmailList")
         Dim iPeriod As Integer = System.Configuration.ConfigurationManager.AppSettings("Period")
+        Dim iDayPeriod As Integer = System.Configuration.ConfigurationManager.AppSettings("DayPeriod")
         Dim startdate As Date = DateAdd(DateInterval.Day, iPeriod, Now())
         Dim enddate As Date = Now()
         Dim depositdate As Date
@@ -212,7 +213,7 @@ Module SuspiciousTransactions
                 and u.USERID not in (10,20,30)
                 and ft.TRANSTYPE in (1100)
                 and not exists(select * from FIN_TRANS ft1
-                where ft1.DATECREATED  between ft.DATECREATED and ft.DATECREATED +10
+                where ft1.DATECREATED  between ft.DATECREATED and ft.DATECREATED + 10
                 and ft.ACCOUNTID = ft1.ACCOUNTID
                 and ft1.TRANSTYPE in (1200,1401))"
 
@@ -225,7 +226,7 @@ Module SuspiciousTransactions
                 and u.USERID not in (10,20,30)
                 and ft.TRANSTYPE in (1100)
                 and not exists(select * from FIN_TRANS ft1
-                where ft1.DATECREATED  between ft.DATECREATED and dateadd(d, 10,ft.DATECREATED)
+                where ft1.DATECREATED  between ft.DATECREATED and dateadd(d, @p2,ft.DATECREATED)
                 and ft.ACCOUNTID = ft1.ACCOUNTID
                 and ft1.TRANSTYPE in (1200,1401));"
 
@@ -234,7 +235,7 @@ Module SuspiciousTransactions
                 Adaptor = New FirebirdSql.Data.FirebirdClient.FbDataAdapter(MySQLFB, New FirebirdSql.Data.FirebirdClient.FbConnection(Configuration.ConfigurationManager.ConnectionStrings("FBConnectionString").ConnectionString))
                 Adaptor.SelectCommand.Parameters.Clear()
                 Adaptor.SelectCommand.Parameters.Add("@p1", FirebirdSql.Data.FirebirdClient.FbDbType.TimeStamp).Value = Now.AddDays(iPeriod)
-
+                Adaptor.SelectCommand.Parameters.Add("@p2", FirebirdSql.Data.FirebirdClient.FbDbType.Integer).Value = iDayPeriod
                 Adaptor.Fill(dt3)
                 Adaptor.Dispose()
             Else
@@ -246,6 +247,7 @@ Module SuspiciousTransactions
                         cmd.Parameters.Clear()
                         With cmd.Parameters
                             .Add(New SqlParameter("@p1", iPeriod))
+                            .Add(New SqlParameter("@p2", iDayPeriod))
                         End With
                         adapter.SelectCommand = cmd
                         adapter.Fill(dt3)
@@ -294,6 +296,7 @@ Module SuspiciousTransactions
                     <th>Transaction Date</th>
                     <th>Individ/Co.</th>
                     <th>Name</th>
+                    <th>Account</th>
                     <th>Amount</th>
                     <th>Transaction Type</th>
                   </tr>"
@@ -305,6 +308,7 @@ Module SuspiciousTransactions
                     sHTML &= "<tr><td>" & fnDBStringField(ThisRow("DATECREATED")) & "</td>"
                     sHTML &= "<td>" & fnDBStringField(ThisRow("companyname")) & "</td>"
                     sHTML &= "<td>" & fnDBStringField(ThisRow("Firstname")) & " " & fnDBStringField(ThisRow("Lastname")) & "</td>"
+                    sHTML &= "<td>" & fnDBStringField(ThisRow("ACCOUNTID")) & "</td>"
                     sHTML &= "<td>" & PenceToCurrencyStringPounds(ThisRow("amount")) & "</td>"
                     sHTML &= "<td>" & fnDBStringField(ThisRow("transtype")) & " - Deposit</td>"
                     sHTML &= vbNewLine
@@ -323,6 +327,7 @@ Module SuspiciousTransactions
                     <th>Transaction Date</th>
                     <th>Individ/Co.</th>
                     <th>Name</th>
+                    <th>Account</th>
                     <th>Amount</th>
                     <th>Transaction Type</th>
                   </tr>"
@@ -330,7 +335,7 @@ Module SuspiciousTransactions
             icount = dt.Rows.Count
 
             For Each ThisRow1 As DataRow In dt1.Rows
-                If fnDBIntField(ThisRow1("icount")) > 3 Then
+                If fnDBIntField(ThisRow1("icount")) > 2 Then
                     For Each ThisRow As DataRow In dt3.Rows
                         If fnDBIntField(ThisRow1("UserID")) = fnDBStringField(ThisRow("UserID")) And fnDBStringField(ThisRow("transtype")) = 1100 Then
                             Dim iUserID As Integer = fnDBIntField(ThisRow("UserID"))
@@ -338,6 +343,7 @@ Module SuspiciousTransactions
                             sHTML &= "<tr><td>" & fnDBStringField(ThisRow("DATECREATED")) & "</td>"
                             sHTML &= "<td>" & fnDBStringField(ThisRow("companyname")) & "</td>"
                             sHTML &= "<td>" & fnDBStringField(ThisRow("Firstname")) & " " & fnDBStringField(ThisRow("Lastname")) & "</td>"
+                            sHTML &= "<td>" & fnDBStringField(ThisRow("ACCOUNTID")) & "</td>"
                             sHTML &= "<td>" & PenceToCurrencyStringPounds(ThisRow("amount")) & "</td>"
                             sHTML &= "<td>" & fnDBStringField(ThisRow("transtype")) & " - Deposit</td>"
                             sHTML &= vbNewLine
@@ -361,6 +367,7 @@ Module SuspiciousTransactions
                     <th>Transaction Date</th>
                     <th>Individ/Co.</th>
                     <th>Name</th>
+                    <th>Account</th>
                     <th>Amount</th>
                     <th>Transaction Type</th>
                   </tr>"
@@ -379,6 +386,7 @@ Module SuspiciousTransactions
                         sHTML &= "<tr><td>" & fnDBStringField(ThisRow("DATECREATED")) & "</td>"
                         sHTML &= "<td>" & fnDBStringField(ThisRow("companyname")) & "</td>"
                         sHTML &= "<td>" & fnDBStringField(ThisRow("Firstname")) & " " & fnDBStringField(ThisRow("Lastname")) & "</td>"
+                        sHTML &= "<td>" & fnDBStringField(ThisRow("ACCOUNTID")) & "</td>"
                         sHTML &= "<td>" & PenceToCurrencyStringPounds(ThisRow("amount")) & "</td>"
                         sHTML &= "<td>" & fnDBStringField(ThisRow("transtype")) & " - Deposit</td>"
                         sHTML &= vbNewLine
@@ -389,6 +397,7 @@ Module SuspiciousTransactions
                         sHTML &= "<tr><td>" & fnDBStringField(ThisRow("DATECREATED")) & "</td>"
                         sHTML &= "<td>" & fnDBStringField(ThisRow("companyname")) & "</td>"
                         sHTML &= "<td>" & fnDBStringField(ThisRow("Firstname")) & " " & fnDBStringField(ThisRow("Lastname")) & "</td>"
+                        sHTML &= "<td>" & fnDBStringField(ThisRow("ACCOUNTID")) & "</td>"
                         sHTML &= "<td>" & PenceToCurrencyStringPounds(ThisRow("amount")) & "</td>"
                         sHTML &= "<td>" & fnDBStringField(ThisRow("transtype")) & " - Withdrawal</td>"
                         sHTML &= vbNewLine
@@ -411,6 +420,7 @@ Module SuspiciousTransactions
                     <th>Transaction Date</th>
                     <th>Individ/Co.</th>
                     <th>Name</th>
+                    <th>Account</th>
                     <th>Amount</th>
                     <th>Transaction Type</th>
                   </tr>"
@@ -422,6 +432,7 @@ Module SuspiciousTransactions
                     sHTML &= "<tr><td>" & fnDBStringField(ThisRow("DATECREATED")) & "</td>"
                     sHTML &= "<td>" & fnDBStringField(ThisRow("companyname")) & "</td>"
                     sHTML &= "<td>" & fnDBStringField(ThisRow("Firstname")) & " " & fnDBStringField(ThisRow("Lastname")) & "</td>"
+                    sHTML &= "<td>" & fnDBStringField(ThisRow("ACCOUNTID")) & "</td>"
                     sHTML &= "<td>" & PenceToCurrencyStringPounds(ThisRow("amount")) & "</td>"
                     sHTML &= "<td>" & fnDBStringField(ThisRow("transtype")) & " - Withdrawal</td>"
                     sHTML &= vbNewLine
