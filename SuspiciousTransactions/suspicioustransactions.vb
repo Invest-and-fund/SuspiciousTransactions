@@ -281,16 +281,16 @@ Module SuspiciousTransactions
                 </head>
                 <table>
                   <tr>
-                    <th style='font-size:30px' colspan=5>Suspicious Transactions Report</th>
+                    <th style='font-size:30px' colspan=6>Suspicious Transactions Report</th>
                   </tr>
                   <tr>
-                    <th style='font-size:15px' align='center' colspan=5>Report Period - Between " & startdate.ToString("dd/MM/yyyy") & " & " & enddate.ToString("dd/MM/yyyy") & "</th>
+                    <th style='font-size:15px' align='center' colspan=6>Report Period - Between " & startdate.ToString("dd/MM/yyyy") & " & " & enddate.ToString("dd/MM/yyyy") & "</th>
                   </tr>
                   <tr>
-                    <th colspan=5></th>
+                    <th colspan=6></th>
                   </tr>
                   <tr>
-                    <th style='font-size:20px' colspan=5>Deposits > £100K </th>
+                    <th style='font-size:20px' colspan=6>Deposits > £100K </th>
                   </tr>
                   <tr>
                     <th>Transaction Date</th>
@@ -318,10 +318,10 @@ Module SuspiciousTransactions
 
             Next
             sHTML &= "<tr>
-                    <th colspan=5></th>
+                    <th colspan=6></th>
                   </tr>
                   <tr>
-                    <th style='font-size:20px' colspan=5>3 or more Deposits and no subsequent Bid or Buy within 10 days</th>
+                    <th style='font-size:20px' colspan=6>3 or more Deposits and no subsequent Bid or Buy within 10 days</th>
                   </tr>
                   <tr>
                     <th>Transaction Date</th>
@@ -351,17 +351,17 @@ Module SuspiciousTransactions
                             ' End If
                         End If
                     Next
-                    sHTML &= "<tr>
-                    <th colspan=5></th>
-                  </tr>"
+                    '  sHTML &= "<tr>
+                    '  <th colspan=6></th>
+                    '</tr>"
                 End If
 
             Next
             sHTML &= "<tr>
-                    <th colspan=5></th>
+                    <th colspan=6></th>
                   </tr>
                   <tr>
-                    <th style='font-size:20px' colspan=5>Deposits and subsequent Withdrawal within 5 days or less </th>
+                    <th style='font-size:20px' colspan=6>Deposits and subsequent Withdrawal within 5 days or less </th>
                   </tr>
                   <tr>
                     <th>Transaction Date</th>
@@ -404,17 +404,17 @@ Module SuspiciousTransactions
                     End If
                 Next
 
-                sHTML &= "<tr>
-                    <th colspan=5></th>
-                  </tr>"
+                'sHTML &= "<tr>
+                '    <th colspan=6></th>
+                '  </tr>"
                 depositdate = "01/01/2000"
             Next
 
             sHTML &= "<tr>
-                    <th colspan=5></th>
+                    <th colspan=6></th>
                   </tr>
                   <tr>
-                    <th style='font-size:20px' colspan=5>Withdrawal > £100K  </th>
+                    <th style='font-size:20px' colspan=6>Withdrawal > £100K  </th>
                   </tr>
                   <tr>
                     <th>Transaction Date</th>
